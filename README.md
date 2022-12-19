@@ -1,5 +1,5 @@
 # fpstm8 - Field Programmable STM8
-An SD card bootloader for STM8S and STM8L microcontrollers. This bootloader is heavily based on the Serial bootloader by lujji. Original repository [here](https://github.com/lujji/stm8-bootloader) and his excelent writeup [here](https://lujji.github.io/blog/serial-bootloader-for-stm8).
+An SD card bootloader for STM8S and STM8L microcontrollers. This bootloader is heavily based on the Serial bootloader by lujji. Original repository [here](https://github.com/lujji/stm8-bootloader) and his excellent write-up [here](https://lujji.github.io/blog/serial-bootloader-for-stm8).
 
 The low level SD control code comes from the [PetitFS project](http://elm-chan.org/fsw/ff/00index_p.html).
 
@@ -33,10 +33,10 @@ Bootloader configuration is located in `config.h`.
 The bootloader will do a normal boot unless all of the following checks (in this order) succeed:
 
 * If BOOT_ON_PIN_STATE is defined, it will **check** the state of the BOOT_PIN. The Card Detect pin of the SD socket can be used as the BOOT_PIN but the appropriate SKIP_SAME_BINARY and AUTO_REBOOT settings should be used to avoid the device endlessly rewriting its flash if the card is left in the socket.
-* It will **try** to initialise the SD card. This obviously fails if there is no SD card present and can also fail for a multitude of other reasons, most obvious one being unsuported SD card version. Suggested fix would be "try another card".
+* It will **try** to initialise the SD card. This obviously fails if there is no SD card present and can also fail for a multitude of other reasons, most obvious one being unsupported SD card version. Suggested fix would be "try another card".
 * It will **try** to read the header from the card. 
 * It will **check** that the BOOT_ADDR found in the header matches its configuration. This is a safety net against incompatible "new" and "old" bootloader versions in the wild.
-* If SKIP_SAME_BINARY is enabled, it will compare the CRC of the installed firmware with the one found in the heade and **fail if they match**.
+* If SKIP_SAME_BINARY is enabled, it will compare the CRC of the installed firmware with the one found in the header and **fail if they match**.
 
 This is the point of no return. If it makes it this far, it will copy the binary from the SD card to the flash and reboot if AUTO_REBOOT is enabled or wait for a reset.
 
@@ -85,3 +85,9 @@ It will finally copy the compiled application to the BIN_SECTOR sector.
 A typical disk has the MBR on sector 0 and the first partition on sector 2048. This, very conveniently, leaves 2047 unused 512-byte sectors between the MBR and the first partition. Sectors 3 & 4 respectively, are the default settings in both the bootloader and the sample application. 
 
 The image produced, will look like any other SD card with a FAT partition to any other device. The bootloader is configured to look for the hidden data in the unused space.
+
+
+## TODO
+* **Test**. This code has barely been tested on an STM8S. More extensive testing before releasing it in the wild, would be wise.
+* **Simplify**. To streamline the development of the main app, a utility that combines the bootloader and app binaries for SWIM programming, would be handy.
+* **Optimise**. The size of the bootloader can probably be reduced further. Besides re-writing parts in assembly, an obvious example would be the CRC calculation. The calculation could be skipped replaced with a single flash read if a unique identifier was stored in a fixed location or at the end of the app binary.
